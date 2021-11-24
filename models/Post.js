@@ -7,12 +7,35 @@ const postSchema = new mongoose.Schema({
     default: [],
   },
   tags: {
-    type: Array,
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     default: [],
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+  },
+  reactions: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reaction",
+      },
+    ],
+    default: [],
+  },
+  comments: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    default: [],
   },
 });
 

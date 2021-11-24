@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const authRoute = require("./routers/auth");
 const userRoute = require("./routers/user");
 const postRoute = require("./routers/posts");
-
+const commentRoute = require("./routers/comments");
 const db = mongoose.connection;
 
 dotenv.config();
@@ -24,6 +24,7 @@ db.on("error", (err) => {
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/posts", postRoute);
+app.use("/comments", commentRoute);
 
 app.listen(process.env.PORT || 3000);
 
