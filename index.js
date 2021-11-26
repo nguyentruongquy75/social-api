@@ -10,6 +10,15 @@ const postRoute = require("./routers/posts");
 const commentRoute = require("./routers/comments");
 const db = mongoose.connection;
 
+// socketio
+const { Server } = require("socket.io");
+const io = new Server();
+
+// server-side
+io.on("connection", (socket) => {
+  socket.emit("greet", "Xin chao");
+});
+
 dotenv.config();
 app.use(bodyParser.json());
 
