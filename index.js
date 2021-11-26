@@ -11,16 +11,18 @@ const commentRoute = require("./routers/comments");
 const db = mongoose.connection;
 
 // socketio
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+
+const { Server } = require("socket.io");
+const server = app.listen(process.env.PORT || 3000);
+const io = new Server(server, {
   cors: {
     origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
-// server-side
-io.on("connection", (socket) => {
-  socket.emit("greet", "Xin chao");
+io.on("connection", function (socket) {
+  socket.emit("greet", "Hello");
 });
 
 dotenv.config();
@@ -39,7 +41,5 @@ app.use("/user", userRoute);
 app.use("/posts", postRoute);
 app.use("/comments", commentRoute);
 app.use("/uploads", express.static("uploads"));
-
-app.listen(process.env.PORT || 3000);
 
 module.exports = app;
