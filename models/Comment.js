@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const Reaction = require("./Reaction");
+
 const commentSchema = mongoose.Schema({
   message: String,
   user: {
@@ -43,6 +45,25 @@ const commentSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   },
+});
+
+// Middleware
+commentSchema.pre("remove", function (next) {
+  const comment = this;
+
+  // remove reply
+  comment.reply.forEach(async (item) => {
+    const deleteReply = await comment.model("Comment").findById(item);
+    deleteReply.remove();
+  });
+
+  // remove reaction
+
+  comment.reactions.forEach(async (item) => {
+    await Reaction.findByIdAndDelete(item);
+  });
+
+  next();
 });
 
 module.exports = mongoose.model("Comment", commentSchema);

@@ -55,7 +55,8 @@ router.delete("/", async (req, res) => {
   const commentId = req.body._id;
 
   try {
-    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    const deletedComment = await Comment.findById(commentId);
+    deletedComment.remove();
 
     // remove comment from post
     const post = await Post.findById(deletedComment.post);
@@ -63,12 +64,6 @@ router.delete("/", async (req, res) => {
     post.comments.pull(deletedComment._id);
 
     await post.save();
-
-    // remove reply, remove reaction
-
-    await Comment.deleteMany({ replyOf: deletedComment._id });
-
-    await Reaction.deleteMany({ forComment: deletedComment._id });
 
     res.status(200).json(deletedComment);
 
@@ -178,6 +173,7 @@ router.post("/:commentId/reply", async (req, res) => {
     const comment = await Comment.findById(commentId);
     const replyComment = new Comment(req.body);
     replyComment.replyOf = commentId;
+    replyComment.post = comment.post;
 
     const savedReplyComment = await replyComment.save();
 

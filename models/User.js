@@ -43,6 +43,35 @@ const userSchema = new mongoose.Schema({
     unique: true,
     ref: "Account",
   },
+  newsfeed: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+  },
+  friendInvitations: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+});
+
+userSchema.pre("save", async function (next) {
+  const user = this;
+  const newsfeedLength = user.newsfeed.length;
+
+  if (newsfeedLength >= 20) {
+    const lastNewsFeedId = user.newsfeed[newsfeedLength - 1];
+    user.newsfeed.pull(lastNewsFeedId);
+    user.save();
+  }
+
+  next();
 });
 
 module.exports = mongoose.model("User", userSchema);

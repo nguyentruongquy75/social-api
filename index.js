@@ -25,6 +25,7 @@ app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/posts", postRoute);
 app.use("/comments", commentRoute);
+app.use("/uploads", express.static("uploads"));
 
 app.listen(process.env.PORT || 3000);
 
