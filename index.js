@@ -11,8 +11,12 @@ const commentRoute = require("./routers/comments");
 const db = mongoose.connection;
 
 // socketio
-const { Server } = require("socket.io");
-const io = new Server();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 // server-side
 io.on("connection", (socket) => {
