@@ -22,7 +22,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", function (socket) {
-  socket.emit("greet", "Hello");
+  console.log(socket.id);
 });
 
 dotenv.config();

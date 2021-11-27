@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
 const Reaction = require("./Reaction");
+const Notification = require("./Notification");
+const User = require("./User");
 
 const commentSchema = mongoose.Schema({
   message: String,
@@ -48,7 +50,7 @@ const commentSchema = mongoose.Schema({
 });
 
 // Middleware
-commentSchema.pre("remove", function (next) {
+commentSchema.pre("remove", async function (next) {
   const comment = this;
 
   // remove reply
@@ -63,6 +65,17 @@ commentSchema.pre("remove", function (next) {
     await Reaction.findByIdAndDelete(item);
   });
 
+  // remove notification
+
+  const notifications = await Notification.find({
+    forComment: comment._id,
+  });
+  const user = await User.findById(comment.user);
+  notifications.forEach((noti) => {
+    user.notifications.pull(noti._id);
+    noti.remove();
+  });
+  user.save();
   next();
 });
 

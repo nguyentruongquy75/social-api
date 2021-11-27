@@ -6,6 +6,7 @@ const router = express.Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
 const Reaction = require("../models/Reaction");
+const Notification = require("../models/Notification");
 
 //======================== Post ===============================
 
@@ -107,15 +108,70 @@ router.post("/:id/reactions", async (req, res) => {
 
   try {
     const post = await Post.findById(postId);
-    const user = await User.findById(req.body.user);
+    const reactionUser = await User.findById(req.body.user);
     const reaction = new Reaction(req.body);
 
-    reaction.user = user._id;
+    reaction.user = reactionUser._id;
     reaction.forPost = post._id;
     const savedReaction = await reaction.save();
 
     post.reactions.push(savedReaction._id);
-    await post.save();
+    post.save();
+    // ok
+
+    // Notification
+    const oldNotification = await Notification.findOne({
+      type: "reaction",
+      forPost: savedReaction.forPost,
+    });
+
+    const postUser = await User.findById(post.user);
+
+    // Check yourself
+
+    if (postUser._id + "" !== reactionUser._id + "") {
+      if (oldNotification) {
+        const postReactions = await Reaction.find({ forPost: post._id });
+
+        const reactionUsers = new Set(
+          postReactions.map((reaction) => reaction.user + "")
+        );
+
+        // filter comment yourself
+
+        reactionUsers.has(postUser._id + "") &&
+          reactionUsers.delete(postUser._id + "");
+
+        const others =
+          reactionUsers.size > 1
+            ? `và ${reactionUsers.size - 1} người khác`
+            : "";
+
+        // update notification
+        oldNotification.title = `${reactionUser.firstName} ${reactionUser.lastName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
+        oldNotification.isRead = false;
+
+        oldNotification.save();
+
+        // update notification arr
+
+        postUser.notifications.pull(oldNotification._id);
+        postUser.notifications.push(oldNotification._id);
+        postUser.save();
+        console.log(reactionUsers);
+      } else {
+        console.log("new");
+        const notification = new Notification({
+          type: "reaction",
+          forPost: savedReaction.forPost,
+          title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bài viết của bạn`,
+        });
+
+        const savedNotification = await notification.save();
+        postUser.notifications.push(savedNotification._id);
+        postUser.save();
+      }
+    }
 
     res.status(200).json(savedReaction);
   } catch (error) {
