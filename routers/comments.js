@@ -77,7 +77,7 @@ router.post("/", async (req, res) => {
         postUser.save();
 
         // socket
-        global.importScripts.sockets.emit(postUser._id, savedNotification);
+        global.io.sockets.emit(postUser._id, savedNotification);
       }
     }
 
