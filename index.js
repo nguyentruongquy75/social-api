@@ -21,9 +21,7 @@ const io = new Server(server, {
   },
 });
 
-io.on("connection", function (socket) {
-  console.log(socket.id);
-});
+global.io = io;
 
 dotenv.config();
 app.use(bodyParser.json());

@@ -158,9 +158,9 @@ router.post("/:id/reactions", async (req, res) => {
         postUser.notifications.pull(oldNotification._id);
         postUser.notifications.push(oldNotification._id);
         postUser.save();
-        console.log(reactionUsers);
+
+        global.io.emit(postUser._id, oldNotification);
       } else {
-        console.log("new");
         const notification = new Notification({
           type: "reaction",
           forPost: savedReaction.forPost,
@@ -170,6 +170,7 @@ router.post("/:id/reactions", async (req, res) => {
         const savedNotification = await notification.save();
         postUser.notifications.push(savedNotification._id);
         postUser.save();
+        global.io.emit(postUser._id, savedNotification);
       }
     }
 

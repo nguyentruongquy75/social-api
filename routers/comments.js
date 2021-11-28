@@ -62,8 +62,10 @@ router.post("/", async (req, res) => {
         postUser.notifications.pull(oldNotification._id);
         postUser.notifications.push(oldNotification._id);
         postUser.save();
+
+        // socket
+        global.importScripts.sockets.emit(postUser._id, oldNotification);
       } else {
-        console.log("new");
         const notification = new Notification({
           type: "comment",
           forPost: savedComment.post,
@@ -73,8 +75,13 @@ router.post("/", async (req, res) => {
         const savedNotification = await notification.save();
         postUser.notifications.push(savedNotification._id);
         postUser.save();
+
+        // socket
+        global.importScripts.sockets.emit(postUser._id, savedNotification);
       }
     }
+
+    // soket notification
 
     res.status(200).json(savedComment);
     session.commitTransaction();
@@ -207,8 +214,10 @@ router.post("/:commentId/reactions", async (req, res) => {
         commentUser.notifications.pull(oldNotification._id);
         commentUser.notifications.push(oldNotification._id);
         commentUser.save();
+
+        // socket notification
+        global.importScripts.sockets.emit(commentUser._id, oldNotification);
       } else {
-        console.log("new");
         const notification = new Notification({
           type: "reaction",
           forComment: savedReaction.forComment,
@@ -218,6 +227,9 @@ router.post("/:commentId/reactions", async (req, res) => {
         const savedNotification = await notification.save();
         commentUser.notifications.push(savedNotification._id);
         commentUser.save();
+
+        // socket notification
+        global.importScripts.sockets.emit(commentUser._id, savedNotification);
       }
     }
 
@@ -334,8 +346,11 @@ router.post("/:commentId/reply", async (req, res) => {
         commentUser.notifications.pull(oldNotification._id);
         commentUser.notifications.push(oldNotification._id);
         commentUser.save();
+
+        // socket notifications
+
+        global.importScripts.sockets.emit(commentUser._id, oldNotification);
       } else {
-        console.log("new");
         const notification = new Notification({
           type: "comment",
           forComment: savedReplyComment.replyOf,
@@ -345,6 +360,9 @@ router.post("/:commentId/reply", async (req, res) => {
         const savedNotification = await notification.save();
         commentUser.notifications.push(savedNotification._id);
         commentUser.save();
+
+        // socket notifications
+        global.io.sockets.emit(commentUser._id, savedNotification);
       }
     }
 

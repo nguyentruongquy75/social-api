@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Account = require("../models/Account");
 const Post = require("../models/Post");
 const Invitation = require("../models/Invitation");
+const Notification = require("../models/Notification");
 const router = express.Router();
 
 const upload = require("../multer");
@@ -182,6 +183,39 @@ router.get("/:id/newsfeed", async function (req, res) {
     });
 
     res.status(200).json(user.newsfeed);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
+// ===================== Notifications =====================
+
+// get all
+router.get("/:id/notifications", async function (req, res) {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId).populate("notifications");
+
+    res.status(200).json(user.notifications);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
+// update isRead
+
+router.patch("/:id/notifications", async function (req, res) {
+  try {
+    const notificationArr = req.body.notifications;
+
+    notificationArr.forEach(async (notiId) => {
+      await Notification.findByIdAndUpdate(notiId, {
+        isRead: true,
+      });
+    });
+
+    res.status(200).json("Change isRead success");
   } catch (error) {
     res.status(400).json(error);
   }
