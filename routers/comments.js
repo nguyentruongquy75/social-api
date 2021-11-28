@@ -64,7 +64,7 @@ router.post("/", async (req, res) => {
         postUser.save();
 
         // socket
-        global.importScripts.sockets.emit(postUser._id, oldNotification);
+        global.io.sockets.emit(postUser._id, oldNotification);
       } else {
         const notification = new Notification({
           type: "comment",
@@ -216,7 +216,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         commentUser.save();
 
         // socket notification
-        global.importScripts.sockets.emit(commentUser._id, oldNotification);
+        global.io.sockets.emit(commentUser._id, oldNotification);
       } else {
         const notification = new Notification({
           type: "reaction",
@@ -229,7 +229,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         commentUser.save();
 
         // socket notification
-        global.importScripts.sockets.emit(commentUser._id, savedNotification);
+        global.io.sockets.emit(commentUser._id, savedNotification);
       }
     }
 
@@ -349,7 +349,7 @@ router.post("/:commentId/reply", async (req, res) => {
 
         // socket notifications
 
-        global.importScripts.sockets.emit(commentUser._id, oldNotification);
+        global.io.sockets.emit(commentUser._id, oldNotification);
       } else {
         const notification = new Notification({
           type: "comment",
