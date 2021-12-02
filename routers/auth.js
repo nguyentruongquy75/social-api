@@ -27,7 +27,6 @@ router.post("/register", async (req, res) => {
   });
 
   try {
-<<<<<<< HEAD
     await newAccount.save();
     const user = new User({
       firstName: req.body.firstName,
@@ -43,17 +42,6 @@ router.post("/register", async (req, res) => {
   } catch (err) {
     res.status(400).json(err);
   }
-=======
-  const savedAccount = await newAccount.save();
-  res.status(200).json({
-    id: savedAccount._id
-  })
-  } catch(error) {
-    res.status(400).json(error)
-  }
-  
-  
->>>>>>> b882303ffe062627154a917150c89ab324869afb
 });
 
 module.exports = router;
