@@ -19,15 +19,16 @@ router.post("/login", async (req, res) => {
 router.post("/register", async (req, res) => {
   const newAccount = new Account(req.body);
 
-  newAccount.save((error) => {
-    if (error) {
-      return res.status(400).json(error);
-    }
-
-    return res.status(200).json({
-      id: newAccount._id,
-    });
-  });
+  try {
+  const savedAccount = await newAccount.save();
+  res.status(200).json({
+    id: savedAccount._id
+  })
+  } catch(error) {
+    res.status(400).json(error)
+  }
+  
+  
 });
 
 module.exports = router;
