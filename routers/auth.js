@@ -35,6 +35,8 @@ router.post("/register", async (req, res) => {
       account: newAccount._id,
     });
 
+    newAccount.user = user._id;
+    await newAccount.save();
     await user.save();
     res.status(200).json({
       id: user._id,
