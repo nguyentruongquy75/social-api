@@ -4,8 +4,8 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
   const account = await Account.findOne({
-    username: req.body.account.username,
-    password: req.body.account.password,
+    username: req.body.username,
+    password: req.body.password,
   });
 
   if (!account)
@@ -17,7 +17,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const newAccount = new Account(req.body.account);
+  const newAccount = new Account(req.body);
 
   newAccount.save((error) => {
     if (error) {

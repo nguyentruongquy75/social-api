@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const authRoute = require("./routers/auth");
 const userRoute = require("./routers/user");
@@ -34,15 +35,7 @@ db.on("error", (err) => {
   console.log("DB connection error:", err.message);
 });
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
-
+app.use(cors());
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/posts", postRoute);
