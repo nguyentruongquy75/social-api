@@ -14,7 +14,7 @@ const db = mongoose.connection;
 // socketio
 
 const { Server } = require("socket.io");
-const server = app.listen(process.env.PORT || 3000);
+const server = app.listen(process.env.PORT || 5000);
 const io = new Server(server, {
   cors: {
     origin: "*",

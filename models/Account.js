@@ -4,8 +4,8 @@ const accountSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -15,7 +15,6 @@ const accountSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    unique: true,
     ref: "User",
   },
 });
