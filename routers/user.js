@@ -182,7 +182,6 @@ router.get("/:id/newsfeed", async function (req, res) {
       options: { sort: { publishedAt: -1 } },
       populate: {
         path: "user reactions",
-        model: "User",
       },
     });
     res.status(200).json(user.newsfeed);
