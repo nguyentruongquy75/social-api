@@ -180,8 +180,11 @@ router.get("/:id/newsfeed", async function (req, res) {
     const user = await User.findById(userId).populate({
       path: "newsfeed",
       options: { sort: { publishedAt: -1 } },
+      populate: {
+        path: "user reactions",
+        model: "User",
+      },
     });
-
     res.status(200).json(user.newsfeed);
   } catch (error) {
     res.status(400).json(error);
