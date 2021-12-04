@@ -286,7 +286,7 @@ router.get("/:commentId/reply", async (req, res) => {
     const comment = await Comment.findById(commentId).populate({
       path: "reply",
       populate: {
-        path: "user",
+        path: "user reactions",
       },
     });
 
