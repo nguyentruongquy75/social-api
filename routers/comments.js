@@ -372,6 +372,7 @@ router.post("/:commentId/reply", async (req, res) => {
       }
     }
 
+    await savedReplyComment.populate("user");
     res.status(200).json(savedReplyComment);
   } catch (error) {
     res.status(400).json(error);
