@@ -283,7 +283,12 @@ router.get("/:commentId/reply", async (req, res) => {
   const commentId = req.params.commentId;
 
   try {
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId).populate({
+      path: "reply",
+      populate: {
+        path: "user",
+      },
+    });
 
     res.status(200).json(comment.reply);
   } catch (error) {
