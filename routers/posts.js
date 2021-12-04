@@ -216,4 +216,21 @@ router.delete("/:id/reactions", async (req, res) => {
   }
 });
 
+// ============== Comment =============================
+
+router.get("/:id/comments", async (req, res) => {
+  const postId = req.params.id;
+
+  try {
+    const post = await Post.findById(postId).populate({
+      path: "comments",
+      populate: {
+        path: "user reactions reply",
+      },
+    });
+    res.status(200).json(post.comments);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
 module.exports = router;
