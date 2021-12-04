@@ -20,6 +20,7 @@ router.post("/", async (req, res) => {
     const post = await Post.findById(postId);
     const newComment = new Comment(req.body);
     const savedComment = await newComment.save();
+    await savedComment.populate("user");
 
     const commentUser = await User.findById(savedComment.user);
     const postUser = await User.findById(post.user);
