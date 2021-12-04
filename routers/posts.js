@@ -225,7 +225,7 @@ router.get("/:id/comments", async (req, res) => {
     const post = await Post.findById(postId).populate({
       path: "comments",
       populate: {
-        path: "user reactions reply",
+        path: "user reactions",
       },
     });
     res.status(200).json(post.comments);
