@@ -91,7 +91,12 @@ router.get("/:id/invite", async function (req, res) {
   const id = req.params.id;
 
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate({
+      path: "friendInvitations",
+      populate: {
+        path: "sender",
+      },
+    });
 
     res.status(200).json(user.friendInvitations);
   } catch (err) {
