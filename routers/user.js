@@ -23,7 +23,7 @@ router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const user = await User.findById(id).populate({
-      path: "posts friends",
+      path: " friends",
     });
     res.status(200).json(user);
   } catch (error) {
@@ -225,6 +225,25 @@ router.patch("/:id/notifications", async function (req, res) {
     });
 
     res.status(200).json("Change isRead success");
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
+// =============== Posts ===============
+
+router.get("/:id/posts", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId).populate({
+      path: "posts",
+      options: { sort: { publishedAt: -1 } },
+      populate: {
+        path: "user reactions",
+      },
+    });
+    res.status(200).json(user.posts);
   } catch (error) {
     res.status(400).json(error);
   }
