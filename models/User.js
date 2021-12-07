@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema({
       },
     ],
   },
+  fullName: String,
 });
 
 userSchema.pre("save", async function (next) {

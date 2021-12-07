@@ -8,10 +8,14 @@ const router = express.Router();
 
 const upload = require("../multer");
 
-// get all user
+// get user by name
 router.get("/", async (req, res) => {
+  const name = req.query.name;
+  const regex = new RegExp(name, "i");
   try {
-    const users = await User.find();
+    const users = await User.find({
+      fullName: { $regex: regex },
+    });
     res.status(200).json(users);
   } catch (error) {
     res.status(400).json(error);
@@ -37,9 +41,11 @@ router.get("/:id", async (req, res) => {
 router.post("/", upload.single("avatar"), (req, res) => {
   const baseUrl = `${req.protocol}://${req.headers.host}`;
   const avatar = `${baseUrl}/uploads/${req.file.filename}`;
+  const fullName = `${req.body.lastName} ${req.body.firstName}`;
   const newUser = new User({
     ...req.body,
     avatar,
+    fullName,
   });
 
   newUser.save(async (error) => {
@@ -55,9 +61,14 @@ router.post("/", upload.single("avatar"), (req, res) => {
 });
 
 // update user
-router.patch("/", async (req, res) => {
+router.patch("/", upload.single("avatar"), async (req, res) => {
+  const baseUrl = `${req.protocol}://${req.headers.host}`;
+  const avatar = `${baseUrl}/uploads/${req.file.filename}`;
   try {
-    const updateUser = await User.findByIdAndUpdate(req.body._id, req.body);
+    const updateUser = await User.findByIdAndUpdate(req.body._id, {
+      ...req.body,
+      avatar,
+    });
     res.status(200).json(updateUser);
   } catch (error) {
     res.status(400).json(error);
