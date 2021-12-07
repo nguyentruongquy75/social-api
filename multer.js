@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     if (file.mimetype == "image/png") extension = ".png";
     else if (file.mimetype == "image/jpg") extension = ".jpg";
     else if (file.mimetype == "image/jpeg") extension = ".jpeg";
-    cb(null, file.originalname + "-" + Date.now() + extension);
+    cb(null, file.filename + "-" + Date.now() + extension);
   },
 });
 
