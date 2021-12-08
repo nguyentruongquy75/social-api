@@ -172,7 +172,7 @@ router.patch("/:id/invite", async function (req, res) {
 
 //delete invitations
 
-router.patch("/:id/invite", async function (req, res) {
+router.delete("/:id/invite", async function (req, res) {
   const userId = req.params.id;
 
   try {
