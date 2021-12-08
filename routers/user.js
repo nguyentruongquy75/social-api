@@ -170,6 +170,25 @@ router.patch("/:id/invite", async function (req, res) {
   }
 });
 
+//delete invitations
+
+router.patch("/:id/invite", async function (req, res) {
+  const userId = req.params.id;
+
+  try {
+    const deleteInvitation = await Invitation.findByIdAndDelete(req.body._id);
+    const receiver = await User.findById(userId);
+
+    // pull invitation
+    receiver.friendInvitations.pull(deleteInvitation._id);
+    receiver.save();
+
+    res.status(200).json("Success");
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 // delete friends
 router.delete("/:id/friends", async (req, res) => {
   const id = req.params.id;
