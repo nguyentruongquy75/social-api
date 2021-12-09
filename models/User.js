@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   },
   province: String,
   avatar: String,
+  cover: String,
   bio: String,
   posts: {
     type: [
@@ -60,6 +61,19 @@ const userSchema = new mongoose.Schema({
     ],
   },
   fullName: String,
+  address: String,
+  status: {
+    type: String,
+    enum: [
+      "Single",
+      "In Relationship",
+      "Engaged",
+      "Married",
+      "Registered cohabitation",
+      "Cohabitation",
+      "Find out",
+    ],
+  },
 });
 
 userSchema.pre("save", async function (next) {
