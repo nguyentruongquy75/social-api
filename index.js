@@ -35,7 +35,6 @@ db.on("error", (err) => {
   console.log("DB connection error:", err.message);
 });
 
-
 app.use(cors());
 app.use("/auth", authRoute);
 app.use("/user", userRoute);

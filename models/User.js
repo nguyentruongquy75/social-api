@@ -8,7 +8,11 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
   province: String,
-  avatar: String,
+  avatar: {
+    type: String,
+    default:
+      "https://firebasestorage.googleapis.com/v0/b/social-1eff4.appspot.com/o/defaultAvatar.png?alt=media&token",
+  },
   cover: String,
   bio: String,
   posts: {
@@ -73,6 +77,10 @@ const userSchema = new mongoose.Schema({
       "Cohabitation",
       "Find out",
     ],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

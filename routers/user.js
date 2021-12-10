@@ -8,6 +8,12 @@ const router = express.Router();
 
 const upload = require("../multer");
 
+const firebase = require("../firebase");
+// test
+router.post("/upload", upload.single("file"), async (req, res) => {
+  firebase.deleteFile("1639104910429event1.png");
+});
+
 // get user by name
 router.get("/", async (req, res) => {
   const name = req.query.name;
@@ -38,14 +44,14 @@ router.get("/:id", async (req, res) => {
 });
 
 // add user
-router.post("/", upload.single("avatar"), (req, res) => {
-  const baseUrl = `${req.protocol}://${req.headers.host}`;
-  const avatar = `${baseUrl}/uploads/${req.file.filename}`;
-  const fullName = `${req.body.lastName} ${req.body.firstName}`;
+router.post("/", upload.single("avatar"), async (req, res) => {
+  let avatar = null;
+  if (req.file) {
+    avatar = await firebase.uploadFile(req.file);
+  }
   const newUser = new User({
     ...req.body,
     avatar,
-    fullName,
   });
 
   newUser.save(async (error) => {
@@ -62,8 +68,10 @@ router.post("/", upload.single("avatar"), (req, res) => {
 
 // update user
 router.patch("/", upload.single("avatar"), async (req, res) => {
-  const baseUrl = `${req.protocol}://${req.headers.host}`;
-  const avatar = `${baseUrl}/uploads/${req.file.filename}`;
+  let avatar = null;
+  if (req.file) {
+    avatar = await firebase.uploadFile(req.file);
+  }
   try {
     const updateUser = await User.findByIdAndUpdate(req.body._id, {
       ...req.body,
