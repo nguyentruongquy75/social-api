@@ -45,9 +45,11 @@ router.get("/:id", async (req, res) => {
 
 // add user
 router.post("/", upload.single("avatar"), async (req, res) => {
-  let avatar = null;
+  let data = req.body;
   if (req.file) {
-    avatar = await firebase.uploadFile(req.file);
+    Object.assign(data, {
+      avatar: await firebase.uploadFile(req.file),
+    });
   }
   const newUser = new User({
     ...req.body,
@@ -68,14 +70,16 @@ router.post("/", upload.single("avatar"), async (req, res) => {
 
 // update user
 router.patch("/", upload.single("avatar"), async (req, res) => {
-  let avatar = null;
+  let data = req.body;
   if (req.file) {
-    avatar = await firebase.uploadFile(req.file);
+    const avatar = await firebase.uploadFile(req.file);
+    Object.assign(data, {
+      avatar,
+    });
   }
   try {
-    const updateUser = await User.findByIdAndUpdate(req.body._id, {
-      ...req.body,
-      avatar,
+    const updateUser = await User.findByIdAndUpdate(req.body._id, data, {
+      new: true,
     });
     res.status(200).json(updateUser);
   } catch (error) {
