@@ -33,6 +33,7 @@ router.post("/register", async (req, res) => {
       lastName: req.body.lastName,
       birthday: req.body.birthday,
       account: newAccount._id,
+      fullName: `${req.body.lastName} ${req.body.firstName}`,
     });
 
     newAccount.user = user._id;
