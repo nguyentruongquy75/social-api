@@ -54,6 +54,7 @@ router.post("/", upload.single("avatar"), async (req, res) => {
   const newUser = new User({
     ...req.body,
     avatar,
+    fullName: `${req.lastName} ${req.firstName}`,
   });
 
   newUser.save(async (error) => {
