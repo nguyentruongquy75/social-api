@@ -51,11 +51,8 @@ router.post("/", upload.single("avatar"), async (req, res) => {
       avatar: await firebase.uploadFile(req.file),
     });
   }
-  const newUser = new User({
-    ...req.body,
-    avatar,
-    fullName: `${req.body.lastName} ${req.body.firstName}`,
-  });
+  data.fullName = `${data.lastName} ${data.firstName}`;
+  const newUser = new User(data);
 
   newUser.save(async (error) => {
     if (error) {
