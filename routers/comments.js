@@ -58,6 +58,7 @@ router.post("/", async (req, res) => {
         oldNotification.user = commentUser._id;
 
         oldNotification.save();
+        await oldNotification.populate("user");
 
         // update notification arr
 
@@ -78,6 +79,7 @@ router.post("/", async (req, res) => {
         const savedNotification = await notification.save();
         postUser.notifications.push(savedNotification._id);
         postUser.save();
+        await savedNotification.populate("user");
 
         // socket
         global.io.sockets.emit(postUser._id, savedNotification);
@@ -212,6 +214,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         oldNotification.user = reactionUser._id;
 
         oldNotification.save();
+        await oldNotification.populate("user reaction");
 
         // update notification arr
 
@@ -232,6 +235,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         const savedNotification = await notification.save();
         commentUser.notifications.push(savedNotification._id);
         commentUser.save();
+        await savedNotification.populate("user reaction");
 
         // socket notification
         global.io.sockets.emit(commentUser._id, savedNotification);
@@ -351,6 +355,7 @@ router.post("/:commentId/reply", async (req, res) => {
         oldNotification.user = commentUser._id;
 
         oldNotification.save();
+        await oldNotification.populate("user");
 
         // update notification arr
 
@@ -372,6 +377,7 @@ router.post("/:commentId/reply", async (req, res) => {
         const savedNotification = await notification.save();
         commentUser.notifications.push(savedNotification._id);
         commentUser.save();
+        await savedNotification.populate("user");
 
         // socket notifications
         global.io.sockets.emit(commentUser._id, savedNotification);
