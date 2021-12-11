@@ -244,7 +244,12 @@ router.get("/:id/notifications", async function (req, res) {
   const userId = req.params.id;
 
   try {
-    const user = await User.findById(userId).populate("notifications");
+    const user = await User.findById(userId).populate({
+      path: "notifications",
+      populate: {
+        path: "user reaction",
+      },
+    });
 
     res.status(200).json(user.notifications);
   } catch (error) {

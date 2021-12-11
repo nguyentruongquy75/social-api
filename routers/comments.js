@@ -55,6 +55,7 @@ router.post("/", async (req, res) => {
         // update notification
         oldNotification.title = `${commentUser.firstName} ${commentUser.lastName} ${others} đã bình luận bình viết của bạn`;
         oldNotification.isRead = false;
+        oldNotification.user = commentUser._id;
 
         oldNotification.save();
 
@@ -71,6 +72,7 @@ router.post("/", async (req, res) => {
           type: "comment",
           forPost: savedComment.post,
           title: `${commentUser.firstName} ${commentUser.lastName} đã bình luận bình viết của bạn`,
+          user: commentUser._id,
         });
 
         const savedNotification = await notification.save();
@@ -207,6 +209,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         // update notification
         oldNotification.title = `${commentUser.firstName} ${commentUser.lastName} ${others} đã bày tỏ cảm xúc về bình luận của bạn`;
         oldNotification.isRead = false;
+        oldNotification.user = reactionUser._id;
 
         oldNotification.save();
 
@@ -223,6 +226,7 @@ router.post("/:commentId/reactions", async (req, res) => {
           type: "reaction",
           forComment: savedReaction.forComment,
           title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bình luận của bạn`,
+          user: reactionUser._id,
         });
 
         const savedNotification = await notification.save();
@@ -344,6 +348,7 @@ router.post("/:commentId/reply", async (req, res) => {
         // update notification
         oldNotification.title = `${replyUser.firstName} ${replyUser.lastName} ${others} đã trả lời bình luận của bạn của bạn`;
         oldNotification.isRead = false;
+        oldNotification.user = commentUser._id;
 
         oldNotification.save();
 
@@ -361,6 +366,7 @@ router.post("/:commentId/reply", async (req, res) => {
           type: "comment",
           forComment: savedReplyComment.replyOf,
           title: `${replyUser.firstName} ${replyUser.lastName} đã trả lời bình luận của bạn`,
+          user: commentUser._id,
         });
 
         const savedNotification = await notification.save();

@@ -150,6 +150,8 @@ router.post("/:id/reactions", async (req, res) => {
         // update notification
         oldNotification.title = `${reactionUser.firstName} ${reactionUser.lastName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
         oldNotification.isRead = false;
+        oldNotification.user = reactionUser._id;
+        oldNotification.reaction = savedReaction._id;
 
         oldNotification.save();
 
@@ -165,6 +167,8 @@ router.post("/:id/reactions", async (req, res) => {
           type: "reaction",
           forPost: savedReaction.forPost,
           title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bài viết của bạn`,
+          user: reactionUser._id,
+          reaction: savedReaction._id,
         });
 
         const savedNotification = await notification.save();

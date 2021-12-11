@@ -19,6 +19,14 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  reaction: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Reaction",
+  },
 });
 
 module.exports = mongoose.model("Notification", notificationSchema);
