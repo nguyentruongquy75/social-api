@@ -79,6 +79,7 @@ router.delete("/", async (req, res) => {
 
     await deletePost.remove();
     user.posts.pull(deletePost._id);
+    user.newsfeed.pull(deletePost._id);
     await user.save();
 
     res.status(200).json(deletePost);
