@@ -174,6 +174,7 @@ router.post("/:id/reactions", async (req, res) => {
         });
 
         const savedNotification = await notification.save();
+        await savedNotification.populate("user reaction");
         postUser.notifications.push(savedNotification._id);
         postUser.save();
         global.io.emit(postUser._id, savedNotification);
