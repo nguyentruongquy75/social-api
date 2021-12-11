@@ -77,7 +77,7 @@ router.delete("/", async (req, res) => {
     const deletePost = await Post.findById(req.body._id);
     const user = await User.findById(deletePost.user._id);
 
-    deletePost.remove();
+    await deletePost.remove();
     user.posts.pull(deletePost._id);
     await user.save();
 
