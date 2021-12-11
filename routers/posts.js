@@ -155,6 +155,8 @@ router.post("/:id/reactions", async (req, res) => {
 
         oldNotification.save();
 
+        await oldNotification.populate("user reaction");
+
         // update notification arr
 
         postUser.notifications.pull(oldNotification._id);
