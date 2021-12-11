@@ -95,7 +95,12 @@ router.get("/:id/reactions", async (req, res) => {
   const postId = req.params.id;
 
   try {
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate({
+      path: "reactions",
+      populate: {
+        path: "user",
+      },
+    });
     res.status(200).json(post.reactions);
   } catch (error) {
     res.status(400).json(error);
