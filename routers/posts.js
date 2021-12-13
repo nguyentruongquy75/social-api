@@ -8,6 +8,8 @@ const User = require("../models/User");
 const Reaction = require("../models/Reaction");
 const Notification = require("../models/Notification");
 
+const firebase = require("../firebase");
+
 //======================== Post ===============================
 
 // get post
@@ -26,12 +28,14 @@ router.get("/:id", async (req, res) => {
 // add post
 router.post("/", upload.array("image", 12), async (req, res) => {
   try {
-    // add post to posts
-    const baseUrl = `${req.protocol}://${req.headers.host}`;
+    // strorage image to firebase
 
-    const image = req.files.map((file) => {
-      return `${baseUrl}/uploads/${file.filename}`;
-    });
+    const image = await Promise.all(
+      req.files.map((file) => {
+        const imageUrl = firebase.uploadFile(file);
+        return imageUrl;
+      })
+    );
 
     const newPost = new Post({
       ...req.body,
