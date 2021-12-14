@@ -31,6 +31,7 @@ const notificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  postId: String,
 });
 
 module.exports = mongoose.model("Notification", notificationSchema);

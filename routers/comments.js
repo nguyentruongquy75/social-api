@@ -230,6 +230,7 @@ router.post("/:commentId/reactions", async (req, res) => {
           forComment: savedReaction.forComment,
           title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bình luận của bạn`,
           user: reactionUser._id,
+          postId: comment.post,
         });
 
         const savedNotification = await notification.save();
@@ -372,6 +373,7 @@ router.post("/:commentId/reply", async (req, res) => {
           forComment: savedReplyComment.replyOf,
           title: `${replyUser.firstName} ${replyUser.lastName} đã trả lời bình luận của bạn`,
           user: commentUser._id,
+          postId: comment.post,
         });
 
         const savedNotification = await notification.save();

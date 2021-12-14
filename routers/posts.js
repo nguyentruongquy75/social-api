@@ -181,6 +181,7 @@ router.post("/:id/reactions", async (req, res) => {
           title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bài viết của bạn`,
           user: reactionUser._id,
           reaction: savedReaction._id,
+          postId,
         });
 
         const savedNotification = await notification.save();
