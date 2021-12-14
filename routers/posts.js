@@ -17,7 +17,7 @@ router.get("/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const post = await Post.findById(id).populate("user");
+    const post = await Post.findById(id).populate("user reactions");
 
     res.status(200).json(post);
   } catch (error) {
