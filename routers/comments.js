@@ -212,6 +212,7 @@ router.post("/:commentId/reactions", async (req, res) => {
         oldNotification.title = `${commentUser.firstName} ${commentUser.lastName} ${others} đã bày tỏ cảm xúc về bình luận của bạn`;
         oldNotification.isRead = false;
         oldNotification.user = reactionUser._id;
+        oldNotification.reaction = reaction._id;
 
         oldNotification.save();
         await oldNotification.populate("user reaction");
@@ -231,6 +232,7 @@ router.post("/:commentId/reactions", async (req, res) => {
           title: `${reactionUser.firstName} ${reactionUser.lastName} đã ${savedReaction.type} bình luận của bạn`,
           user: reactionUser._id,
           postId: comment.post,
+          reaction: reaction._id,
         });
 
         const savedNotification = await notification.save();
