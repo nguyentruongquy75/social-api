@@ -140,6 +140,9 @@ router.post("/:id/invite", async function (req, res) {
 
     user.friendInvitations.push(savedInvitation._id);
 
+    // socket
+    global.io.sockets.emit(userId + "invitation", savedInvitation);
+
     await user.save();
     res.status(200).json(invitation);
   } catch (err) {
@@ -192,6 +195,9 @@ router.delete("/:id/invite", async function (req, res) {
     // pull invitation
     receiver.friendInvitations.pull(deleteInvitation._id);
     receiver.save();
+
+    // socket
+    global.io.sockets.emit(receiver._id + "invitation", savedInvitation);
 
     res.status(200).json("Success");
   } catch (err) {
