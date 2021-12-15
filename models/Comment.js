@@ -48,7 +48,7 @@ const commentSchema = mongoose.Schema({
     ref: "Comment",
   },
   createAt: {
-    type: String,
+    type: Date,
     default: Date.now,
   },
 });
