@@ -47,6 +47,10 @@ const commentSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   },
+  createAt: {
+    type: String,
+    default: Date.now,
+  },
 });
 
 // Middleware
