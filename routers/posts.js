@@ -63,13 +63,28 @@ router.post("/", upload.array("image", 12), async (req, res) => {
 });
 
 // update post
-router.patch("/", async (req, res) => {
+router.patch("/", upload.array("image", 12), async (req, res) => {
   try {
-    const updatePost = await Post.findByIdAndUpdate(req.body._id, req.body, {
-      new: true,
-    });
+    const image = await Promise.all(
+      req.files.map((file) => {
+        const imageUrl = firebase.uploadFile(file);
+        return imageUrl;
+      })
+    );
+    const updatePost = await Post.findByIdAndUpdate(
+      req.body._id,
+      {
+        ...req.body,
+        image: image.concat(req.body.image),
+      },
+      {
+        new: true,
+      }
+    );
 
     res.status(200).json(updatePost);
+
+    console.log(req.body.image);
   } catch (error) {
     res.status(400).json(error);
   }
