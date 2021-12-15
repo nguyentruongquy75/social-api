@@ -67,7 +67,7 @@ router.post("/", async (req, res) => {
         postUser.save();
 
         // socket
-        global.io.sockets.emit(postUser._id, oldNotification);
+        global.io.sockets.emit(postUser._id + "notification", oldNotification);
       } else {
         const notification = new Notification({
           type: "comment",
@@ -82,11 +82,12 @@ router.post("/", async (req, res) => {
         await savedNotification.populate("user");
 
         // socket
-        global.io.sockets.emit(postUser._id, savedNotification);
+        global.io.sockets.emit(
+          postUser._id + "notification",
+          savedNotification
+        );
       }
     }
-
-    // soket notification
 
     res.status(200).json(savedComment);
     session.commitTransaction();
@@ -136,6 +137,9 @@ router.delete("/", async (req, res) => {
     post.save();
 
     res.status(200).json(deletedComment);
+
+    // socket
+    global.io.sockets.emit(post.user + "notification", "Change");
 
     await session.commitTransaction();
   } catch (error) {
@@ -224,7 +228,10 @@ router.post("/:commentId/reactions", async (req, res) => {
         commentUser.save();
 
         // socket notification
-        global.io.sockets.emit(commentUser._id, oldNotification);
+        global.io.sockets.emit(
+          commentUser._id + "notification",
+          oldNotification
+        );
       } else {
         const notification = new Notification({
           type: "reaction",
@@ -241,7 +248,10 @@ router.post("/:commentId/reactions", async (req, res) => {
         await savedNotification.populate("user reaction");
 
         // socket notification
-        global.io.sockets.emit(commentUser._id, savedNotification);
+        global.io.sockets.emit(
+          commentUser._id + "notification",
+          savedNotification
+        );
       }
     }
 
@@ -280,6 +290,9 @@ router.delete("/:commentId/reactions", async (req, res) => {
     const comment = await Comment.findById(commentId);
     comment.reactions.pull(reactionId);
     await comment.save();
+
+    // socket
+    global.io.sockets.emit(comment.user + "notification", "Change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {
@@ -368,7 +381,10 @@ router.post("/:commentId/reply", async (req, res) => {
 
         // socket notifications
 
-        global.io.sockets.emit(commentUser._id, oldNotification);
+        global.io.sockets.emit(
+          commentUser._id + "notification",
+          oldNotification
+        );
       } else {
         const notification = new Notification({
           type: "comment",
@@ -384,7 +400,10 @@ router.post("/:commentId/reply", async (req, res) => {
         await savedNotification.populate("user");
 
         // socket notifications
-        global.io.sockets.emit(commentUser._id, savedNotification);
+        global.io.sockets.emit(
+          commentUser._id + "notification",
+          savedNotification
+        );
       }
     }
 
@@ -426,6 +445,9 @@ router.delete("/:commentId/reply", async (req, res) => {
     comment.reply.pull(deletedComment._id);
 
     await comment.save();
+
+    // socket
+    global.io.sockets.emit(comment.user + "notification", "Change");
 
     res.status(200).json(deletedComment);
   } catch (error) {

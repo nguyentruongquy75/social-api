@@ -99,7 +99,11 @@ router.delete("/", async (req, res) => {
     await deletePost.remove();
     user.posts.pull(deletePost._id);
     user.newsfeed.pull(deletePost._id);
+
     await user.save();
+
+    // socket
+    global.io.sockets.emit(user._id + "notification", "Change");
 
     res.status(200).json(deletePost);
   } catch (error) {
@@ -188,7 +192,7 @@ router.post("/:id/reactions", async (req, res) => {
         postUser.notifications.push(oldNotification._id);
         postUser.save();
 
-        global.io.emit(postUser._id, oldNotification);
+        global.io.emit(postUser._id + "notification", oldNotification);
       } else {
         const notification = new Notification({
           type: "reaction",
@@ -203,7 +207,7 @@ router.post("/:id/reactions", async (req, res) => {
         await savedNotification.populate("user reaction");
         postUser.notifications.push(savedNotification._id);
         postUser.save();
-        global.io.emit(postUser._id, savedNotification);
+        global.io.emit(postUser._id + "notification", savedNotification);
       }
     }
 
@@ -242,6 +246,9 @@ router.delete("/:id/reactions", async (req, res) => {
     const post = await Post.findById(postId);
     post.reactions.pull(reactionId);
     await post.save();
+
+    // socket
+    global.io.sockets.emit(post.user + "notification", "Change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {
