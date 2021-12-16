@@ -74,6 +74,7 @@ router.post("/", async (req, res) => {
           forPost: savedComment.post,
           title: `${commentUser.firstName} ${commentUser.lastName} đã bình luận bình viết của bạn`,
           user: commentUser._id,
+          postId,
         });
 
         const savedNotification = await notification.save();
@@ -148,12 +149,24 @@ router.delete("/", async (req, res) => {
     });
 
     if (oldNotification) {
-      const latestComment = post.comments[post.comments.length - 1];
+      const uniqueUserComment = [
+        ...new Set(
+          post.comments
+            .filter((comment) => comment.user._id + "" !== post.user + "")
+            .map((comment) => comment.user._id)
+        ),
+      ];
+      const comments = post.comments.filter(
+        (comment) => comment.user._id + "" !== post.user + ""
+      );
+
+      const latestComment = comments[comments.length - 1];
+
       const others =
-        post.comments.length > 1
-          ? `và ${post.comments.length - 1} người khác`
+        uniqueUserComment.length > 1
+          ? `và ${uniqueUserComment.length - 1} người khác`
           : "";
-      if (post.comments.length === 1) {
+      if (uniqueUserComment.length === 1) {
         oldNotification.title = `${latestComment.user.fullName} đã bình luận bài viết của bạn`;
       } else {
         oldNotification.title = `${latestComment.user.fullName} ${others} đã bình luận bài viết của bạn`;
@@ -162,7 +175,7 @@ router.delete("/", async (req, res) => {
       await oldNotification.save();
     }
     // socket
-    global.io.sockets.emit(post.user + "notification", "Change");
+    global.io.sockets.emit(post.user + "notification", oldNotification);
 
     res.status(200).json(deletedComment);
 
@@ -329,12 +342,23 @@ router.delete("/:commentId/reactions", async (req, res) => {
     });
 
     if (oldNotification) {
-      const latestReaction = comment.reactions[comment.reactions.length - 1];
+      const uniqueUserReaction = [
+        ...new Set(
+          comment.reactions
+            .filter((reaction) => reaction.user._id + "" !== comment.user + "")
+            .map((reaction) => reaction.user._id)
+        ),
+      ];
+      const latestReaction =
+        comment.reactions[comment.reactions.length - 1].user._id + "" !==
+        comment.user + ""
+          ? comment.reactions[comment.reactions.length - 1]
+          : comment.reactions[comment.reactions.length - 2];
       const others =
-        comment.reactions.length > 1
-          ? `và ${comment.reactions.length - 1} người khác`
+        uniqueUserReaction.length > 1
+          ? `và ${uniqueUserReaction.length - 1} người khác`
           : "";
-      if (comment.reactions.length === 1) {
+      if (uniqueUserReaction.length === 1) {
         oldNotification.title = `${latestReaction.user.fullName} đã ${latestReaction.type} bài viết của bạn`;
       } else {
         oldNotification.title = `${latestReaction.user.fullName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
@@ -344,7 +368,7 @@ router.delete("/:commentId/reactions", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(comment.user + "notification", "Change");
+    global.io.sockets.emit(comment.user + "notification", oldNotification);
 
     res.status(200).json(deleteReaction);
   } catch (error) {
@@ -510,12 +534,23 @@ router.delete("/:commentId/reply", async (req, res) => {
     });
 
     if (oldNotification) {
-      const latestReply = comment.reply[comment.reply.length - 1];
+      const uniqueUserReply = [
+        ...new Set(
+          comment.reply
+            .filter((reply) => reply.user._id + "" !== comment.user + "")
+            .map((reply) => reply.user._id)
+        ),
+      ];
+      const reply = comment.reply.filter(
+        (comment) => comment.user._id + "" !== post.user + ""
+      );
+
+      const latestReply = reply[reply.length - 1];
       const others =
-        comment.reply.length > 1
-          ? `và ${comment.reply.length - 1} người khác`
+        uniqueUserReply.length > 1
+          ? `và ${uniqueUserReply.length - 1} người khác`
           : "";
-      if (comment.reply.length === 1) {
+      if (uniqueUserReply.length === 1) {
         oldNotification.title = `${latestReply.user.fullName} đã trả lời bình luận của bạn`;
       } else {
         oldNotification.title = `${latestReply.user.fullName} ${others} đã trả lời bình luận của bạn`;
@@ -525,7 +560,7 @@ router.delete("/:commentId/reply", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(comment.user + "notification", "Change");
+    global.io.sockets.emit(comment.user + "notification", oldNotification);
 
     res.status(200).json(deletedComment);
   } catch (error) {

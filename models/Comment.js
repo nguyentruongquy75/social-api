@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Reaction = require("./Reaction");
 
 const User = require("./User");
+const Notification = require("./Notification");
 
 const commentSchema = mongoose.Schema({
   message: String,

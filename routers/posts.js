@@ -260,12 +260,23 @@ router.delete("/:id/reactions", async (req, res) => {
     });
 
     if (oldNotification) {
-      const latestReaction = post.reactions[post.reactions.length - 1];
+      const uniqueUserReaction = [
+        ...new Set(
+          post.reactions
+            .filter((reaction) => reaction.user._id + "" !== post.user + "")
+            .map((reaction) => reaction.user._id)
+        ),
+      ];
+      const latestReaction =
+        post.reactions[post.reactions.length - 1].user._id + "" !==
+        post.user + ""
+          ? post.reactions[post.reactions.length - 1]
+          : post.reactions[post.reactions.length - 2];
       const others =
-        post.reactions.length > 1
-          ? `và ${post.reactions.length - 1} người khác`
+        uniqueUserReaction.length > 1
+          ? `và ${uniqueUserReaction.length - 1} người khác`
           : "";
-      if (post.reactions.length === 1) {
+      if (uniqueUserReaction.length === 1) {
         oldNotification.title = `${latestReaction.user.fullName} đã ${latestReaction.type} bài viết của bạn`;
       } else {
         oldNotification.title = `${latestReaction.user.fullName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
@@ -275,7 +286,7 @@ router.delete("/:id/reactions", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(post.user + "notification", "Change");
+    global.io.sockets.emit(post.user + "notification", oldNotification);
 
     res.status(200).json(deleteReaction);
   } catch (error) {
