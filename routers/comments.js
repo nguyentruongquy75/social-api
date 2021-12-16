@@ -515,7 +515,8 @@ router.delete("/:commentId/reply", async (req, res) => {
   const replyCommentId = req.body._id;
 
   try {
-    const deletedComment = await Comment.findByIdAndDelete(replyCommentId);
+    const deletedComment = await Comment.findById(replyCommentId);
+    await deletedComment.remove();
     const comment = await Comment.findById(commentId).populate({
       path: "reply",
       populate: {
@@ -532,6 +533,8 @@ router.delete("/:commentId/reply", async (req, res) => {
       type: "comment",
       forComment: commentId,
     });
+
+    console.log(oldNotification);
 
     if (oldNotification) {
       const uniqueUserReply = [

@@ -67,7 +67,8 @@ commentSchema.pre("remove", async function (next) {
   // remove reaction
 
   comment.reactions.forEach(async (item) => {
-    await Reaction.findByIdAndDelete(item);
+    const deletedReaction = await Reaction.findById(item);
+    deletedReaction.remove();
   });
 
   // remove notification of comment
@@ -76,6 +77,7 @@ commentSchema.pre("remove", async function (next) {
   const notifications = await Notification.find({
     forComment: comment._id,
   });
+
   const user = await User.findById(comment.user);
   notifications.forEach((noti) => {
     user.notifications.pull(noti._id);
@@ -98,13 +100,14 @@ commentSchema.pre("remove", async function (next) {
       });
     }
 
-    if (!notification.title.includes("và")) {
+    if (notification && !notification.title.includes("và")) {
       await notification.remove();
     }
   } catch (err) {
     console.log(err);
   }
 
+  console.log("next");
   next();
 });
 
