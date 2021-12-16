@@ -242,10 +242,37 @@ router.delete("/:id/reactions", async (req, res) => {
   const reactionId = req.body._id;
 
   try {
-    const deleteReaction = await Reaction.findByIdAndDelete(reactionId);
-    const post = await Post.findById(postId);
+    const deleteReaction = await Reaction.findById(reactionId);
+    await deleteReaction.remove();
+    const post = await Post.findById(postId).populate({
+      path: "reactions",
+      populate: {
+        path: "user",
+      },
+    });
     post.reactions.pull(reactionId);
     await post.save();
+
+    // update notification
+    const oldNotification = await Notification.findOne({
+      type: "reaction",
+      forPost: deleteReaction.forPost,
+    });
+
+    if (oldNotification) {
+      const latestReaction = post.reactions[post.reactions.length - 1];
+      const others =
+        post.reactions.length > 1
+          ? `và ${post.reactions.length - 1} người khác`
+          : "";
+      if (post.reactions.length === 1) {
+        oldNotification.title = `${latestReaction.user.fullName} đã ${latestReaction.type} bài viết của bạn`;
+      } else {
+        oldNotification.title = `${latestReaction.user.fullName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
+      }
+
+      await oldNotification.save();
+    }
 
     // socket
     global.io.sockets.emit(post.user + "notification", "Change");

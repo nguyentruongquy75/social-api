@@ -130,16 +130,41 @@ router.delete("/", async (req, res) => {
     deletedComment.remove();
 
     // remove comment from post
-    const post = await Post.findById(deletedComment.post);
+    const post = await Post.findById(deletedComment.post).populate({
+      path: "comments",
+      populate: {
+        path: "user",
+      },
+    });
 
     post.comments.pull(deletedComment._id);
 
     post.save();
 
-    res.status(200).json(deletedComment);
+    // update notification
+    const oldNotification = await Notification.findOne({
+      type: "comment",
+      forPost: deletedComment.post,
+    });
 
+    if (oldNotification) {
+      const latestComment = post.comments[post.comments.length - 1];
+      const others =
+        post.comments.length > 1
+          ? `và ${post.comments.length - 1} người khác`
+          : "";
+      if (post.comments.length === 1) {
+        oldNotification.title = `${latestComment.user.fullName} đã bình luận bài viết của bạn`;
+      } else {
+        oldNotification.title = `${latestComment.user.fullName} ${others} đã bình luận bài viết của bạn`;
+      }
+
+      await oldNotification.save();
+    }
     // socket
     global.io.sockets.emit(post.user + "notification", "Change");
+
+    res.status(200).json(deletedComment);
 
     await session.commitTransaction();
   } catch (error) {
@@ -286,10 +311,37 @@ router.delete("/:commentId/reactions", async (req, res) => {
   const reactionId = req.body._id;
 
   try {
-    const deleteReaction = await Reaction.findByIdAndDelete(reactionId);
-    const comment = await Comment.findById(commentId);
+    const deleteReaction = await Reaction.findById(reactionId);
+    await deleteReaction.remove();
+    const comment = await Comment.findById(commentId).populate({
+      path: "reactions",
+      populate: {
+        path: "user",
+      },
+    });
     comment.reactions.pull(reactionId);
     await comment.save();
+
+    // update notification
+    const oldNotification = await Notification.findOne({
+      type: "reaction",
+      forComment: deleteReaction.forComment,
+    });
+
+    if (oldNotification) {
+      const latestReaction = comment.reactions[comment.reactions.length - 1];
+      const others =
+        comment.reactions.length > 1
+          ? `và ${comment.reactions.length - 1} người khác`
+          : "";
+      if (comment.reactions.length === 1) {
+        oldNotification.title = `${latestReaction.user.fullName} đã ${latestReaction.type} bài viết của bạn`;
+      } else {
+        oldNotification.title = `${latestReaction.user.fullName} ${others} đã bày tỏ cảm xúc về bài viết của bạn`;
+      }
+
+      await oldNotification.save();
+    }
 
     // socket
     global.io.sockets.emit(comment.user + "notification", "Change");
@@ -440,11 +492,37 @@ router.delete("/:commentId/reply", async (req, res) => {
 
   try {
     const deletedComment = await Comment.findByIdAndDelete(replyCommentId);
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId).populate({
+      path: "reply",
+      populate: {
+        path: "user",
+      },
+    });
 
     comment.reply.pull(deletedComment._id);
 
     await comment.save();
+
+    // update notification
+    const oldNotification = await Notification.findOne({
+      type: "comment",
+      forComment: commentId,
+    });
+
+    if (oldNotification) {
+      const latestReply = comment.reply[comment.reply.length - 1];
+      const others =
+        comment.reply.length > 1
+          ? `và ${comment.reply.length - 1} người khác`
+          : "";
+      if (comment.reply.length === 1) {
+        oldNotification.title = `${latestReply.user.fullName} đã trả lời bình luận của bạn`;
+      } else {
+        oldNotification.title = `${latestReply.user.fullName} ${others} đã trả lời bình luận của bạn`;
+      }
+
+      await oldNotification.save();
+    }
 
     // socket
     global.io.sockets.emit(comment.user + "notification", "Change");

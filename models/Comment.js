@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const Reaction = require("./Reaction");
-const Notification = require("./Notification");
+
 const User = require("./User");
 
 const commentSchema = mongoose.Schema({
@@ -69,7 +69,7 @@ commentSchema.pre("remove", async function (next) {
     await Reaction.findByIdAndDelete(item);
   });
 
-  // remove notification
+  // remove notification of comment
 
   const notifications = await Notification.find({
     forComment: comment._id,
@@ -80,6 +80,25 @@ commentSchema.pre("remove", async function (next) {
     noti.remove();
   });
   user.save();
+
+  // remove notification from post or comment reply
+  let notification;
+  if (comment.replyOf) {
+    notification = await Notification.findOne({
+      type: "comment",
+      forComment: comment.replyOf,
+    });
+  } else {
+    notification = await Notification.findOne({
+      type: "comment",
+      forPost: comment.post,
+    });
+  }
+
+  if (!notification.title.includes("và")) {
+    await notification.remove();
+  }
+
   next();
 });
 
