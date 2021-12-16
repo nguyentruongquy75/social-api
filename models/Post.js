@@ -66,12 +66,14 @@ postSchema.pre("remove", async function (next) {
   const user = await User.findById(post.user);
 
   const notifications = await Notification.find({
-    forPost: post._id,
+    postId: post._id,
   });
 
   notifications.forEach((noti) => {
     user.notifications.pull(noti._id);
     noti.remove();
+    // socket
+    global.io.sockets.emit(user._id + "notification", noti);
   });
 
   user.save();
