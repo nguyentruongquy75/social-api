@@ -73,7 +73,6 @@ commentSchema.pre("remove", async function (next) {
 
   // remove notification of comment
 
-  console.log(comment);
   const notifications = await Notification.find({
     forComment: comment._id,
   });
@@ -107,7 +106,6 @@ commentSchema.pre("remove", async function (next) {
     console.log(err);
   }
 
-  console.log("next");
   next();
 });
 

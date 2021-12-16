@@ -39,7 +39,7 @@ reactionSchema.pre("remove", async function (next) {
     });
   }
 
-  if (!notification.title.includes("và")) {
+  if (notification && !notification.title.includes("và")) {
     await notification.remove();
   }
 });

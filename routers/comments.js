@@ -128,7 +128,7 @@ router.delete("/", async (req, res) => {
 
   try {
     const deletedComment = await Comment.findById(commentId);
-    deletedComment.remove();
+    await deletedComment.remove();
 
     // remove comment from post
     const post = await Post.findById(deletedComment.post).populate({
@@ -147,6 +147,8 @@ router.delete("/", async (req, res) => {
       type: "comment",
       forPost: deletedComment.post,
     });
+
+    console.log(oldNotification);
 
     if (oldNotification) {
       const uniqueUserComment = [
@@ -533,8 +535,6 @@ router.delete("/:commentId/reply", async (req, res) => {
       type: "comment",
       forComment: commentId,
     });
-
-    console.log(oldNotification);
 
     if (oldNotification) {
       const uniqueUserReply = [
