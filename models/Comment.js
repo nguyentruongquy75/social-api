@@ -72,6 +72,7 @@ commentSchema.pre("remove", async function (next) {
 
   // remove notification of comment
 
+  console.log(comment);
   const notifications = await Notification.find({
     forComment: comment._id,
   });
@@ -82,22 +83,26 @@ commentSchema.pre("remove", async function (next) {
   });
   user.save();
 
-  // remove notification from post or comment reply
-  let notification;
-  if (comment.replyOf) {
-    notification = await Notification.findOne({
-      type: "comment",
-      forComment: comment.replyOf,
-    });
-  } else {
-    notification = await Notification.findOne({
-      type: "comment",
-      forPost: comment.post,
-    });
-  }
+  try {
+    // remove notification from post or comment reply
+    let notification;
+    if (comment.replyOf) {
+      notification = await Notification.findOne({
+        type: "comment",
+        forComment: comment.replyOf,
+      });
+    } else {
+      notification = await Notification.findOne({
+        type: "comment",
+        forPost: comment.post,
+      });
+    }
 
-  if (!notification.title.includes("và")) {
-    await notification.remove();
+    if (!notification.title.includes("và")) {
+      await notification.remove();
+    }
+  } catch (err) {
+    console.log(err);
   }
 
   next();

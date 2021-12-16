@@ -94,11 +94,19 @@ router.patch("/", upload.array("image", 12), async (req, res) => {
 router.delete("/", async (req, res) => {
   try {
     const deletePost = await Post.findById(req.body._id);
-    const user = await User.findById(deletePost.user._id);
+    const user = await User.findById(deletePost.user._id).populate({
+      path: "friends",
+    });
 
     await deletePost.remove();
     user.posts.pull(deletePost._id);
     user.newsfeed.pull(deletePost._id);
+    user.friends.forEach((friend) => {
+      friend.newsfeed.pull(deletePost._id);
+      friend.save();
+      // socket
+      global.io.sockets.emit(friend._id + "notification", "Change");
+    });
 
     await user.save();
 

@@ -54,7 +54,7 @@ postSchema.pre("remove", async function (next) {
   // remove comments
   post.comments.forEach(async (item) => {
     const deleteComment = await Comment.findById(item);
-    deleteComment.remove();
+    await deleteComment.remove();
   });
 
   // remove reactions
@@ -72,8 +72,6 @@ postSchema.pre("remove", async function (next) {
   notifications.forEach((noti) => {
     user.notifications.pull(noti._id);
     noti.remove();
-    // socket
-    global.io.sockets.emit(user._id + "notification", noti);
   });
 
   user.save();
