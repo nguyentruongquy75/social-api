@@ -61,14 +61,14 @@ commentSchema.pre("remove", async function (next) {
   // remove reply
   comment.reply.forEach(async (item) => {
     const deleteReply = await comment.model("Comment").findById(item);
-    deleteReply.remove();
+    await deleteReply.remove();
   });
 
   // remove reaction
 
   comment.reactions.forEach(async (item) => {
     const deletedReaction = await Reaction.findById(item);
-    deletedReaction.remove();
+    await deletedReaction.remove();
   });
 
   // remove notification of comment
