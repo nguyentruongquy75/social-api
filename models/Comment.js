@@ -91,21 +91,21 @@ commentSchema.pre("remove", async function (next) {
       notification = await Notification.findOne({
         type: "comment",
         forComment: comment.replyOf,
-      });
+      }).populate("forComment");
     } else {
       notification = await Notification.findOne({
         type: "comment",
         forPost: comment.post,
-      });
+      }).populate("forPost");
     }
 
     if (notification && !notification.title.includes("và")) {
       if (notification.replyOf) {
-        const user = await User.findById(notification.user);
+        const user = await User.findById(notification.forComment.user);
         user.notifications.pull(notification._id);
         user.save();
       } else {
-        const user = await User.findById(notification.user);
+        const user = await User.findById(notification.forPost.user);
         user.notifications.pull(notification._id);
         user.save();
       }
