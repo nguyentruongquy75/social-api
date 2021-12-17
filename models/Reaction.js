@@ -6,7 +6,7 @@ const User = require("./User");
 const reactionSchema = mongoose.Schema({
   type: {
     type: "String",
-    enum: ["Like", "Haha", "Love", "Sad", "Wow", "Angry"],
+    enum: ["Like", "Haha", "Love", "Sad", "Wow", "Angry", "Care"],
     require: true,
   },
   user: {

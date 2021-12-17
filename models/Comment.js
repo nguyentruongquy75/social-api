@@ -107,12 +107,14 @@ commentSchema.pre("remove", async function (next) {
         user.notifications.pull(notification._id);
         user.save();
         // socket
+
         global.io.sockets.emit(user._id + "notification", "change");
       } else {
         const user = await User.findById(notification.forPost.user);
         user.notifications.pull(notification._id);
         user.save();
         // socket
+        console.log(user);
         global.io.sockets.emit(user._id + "notification", "change");
       }
 
