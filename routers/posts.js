@@ -219,6 +219,7 @@ router.post("/:id/reactions", async (req, res) => {
       }
     }
 
+    global.io.emit(post._id + "postreactions", "change");
     res.status(200).json(savedReaction);
   } catch (error) {
     res.status(200).json(error);
@@ -236,6 +237,8 @@ router.patch("/:id/reactions", async (req, res) => {
       req.body,
       { new: true }
     );
+
+    global.io.emit(updatedReaction.forPost + "postreactions", "change");
 
     res.status(200).json(updatedReaction);
   } catch (error) {
@@ -295,6 +298,8 @@ router.delete("/:id/reactions", async (req, res) => {
 
     // socket
     global.io.sockets.emit(post.user + "notification", "change");
+
+    global.io.emit(postId + "postreactions", "change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {

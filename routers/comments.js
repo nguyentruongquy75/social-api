@@ -90,6 +90,9 @@ router.post("/", async (req, res) => {
       }
     }
 
+    // socket
+    global.io.emit(postId + "postcomment", "change");
+
     res.status(200).json(savedComment);
     session.commitTransaction();
   } catch (error) {
@@ -148,8 +151,6 @@ router.delete("/", async (req, res) => {
       forPost: deletedComment.post,
     });
 
-    console.log(oldNotification);
-
     if (oldNotification) {
       const uniqueUserComment = [
         ...new Set(
@@ -178,6 +179,8 @@ router.delete("/", async (req, res) => {
     }
     // socket
     global.io.sockets.emit(post.user + "notification", "change");
+
+    global.io.emit(post._id + "postcomment", "change");
 
     res.status(200).json(deletedComment);
 
@@ -295,6 +298,9 @@ router.post("/:commentId/reactions", async (req, res) => {
       }
     }
 
+    // socket
+    global.io.emit(commentId + "commentreactions", "change");
+
     res.status(200).json(savedReaction);
   } catch (error) {
     res.status(200).json(error);
@@ -312,7 +318,8 @@ router.patch("/:commentId/reactions", async (req, res) => {
       req.body,
       { new: true }
     );
-
+    // socket
+    global.io.emit(updatedReaction.forComment + "commentreactions", "change");
     res.status(200).json(updatedReaction);
   } catch (error) {
     res.status(400).json(error);
@@ -371,6 +378,8 @@ router.delete("/:commentId/reactions", async (req, res) => {
 
     // socket
     global.io.sockets.emit(comment.user + "notification", "change");
+
+    global.io.emit(commentId + "commentreactions", "change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {
@@ -485,6 +494,9 @@ router.post("/:commentId/reply", async (req, res) => {
       }
     }
 
+    // socket
+    global.io.emit(commentId + "commentreply", "change");
+
     await savedReplyComment.populate("user");
     res.status(200).json(savedReplyComment);
   } catch (error) {
@@ -564,6 +576,8 @@ router.delete("/:commentId/reply", async (req, res) => {
 
     // socket
     global.io.sockets.emit(comment.user + "notification", "change");
+
+    global.io.emit(commentId + "commentreply", "change");
 
     res.status(200).json(deletedComment);
   } catch (error) {
