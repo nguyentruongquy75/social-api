@@ -96,11 +96,13 @@ commentSchema.pre("remove", async function (next) {
       notification = await Notification.findOne({
         type: "comment",
         forPost: comment.post,
-      }).populate("forPost");
+      }).populate({
+        path: "forPost",
+      });
     }
 
     if (notification && !notification.title.includes("và")) {
-      if (notification.replyOf) {
+      if (notification.forComment) {
         const user = await User.findById(notification.forComment.user);
         user.notifications.pull(notification._id);
         user.save();
