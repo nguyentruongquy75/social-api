@@ -100,6 +100,16 @@ commentSchema.pre("remove", async function (next) {
     }
 
     if (notification && !notification.title.includes("và")) {
+      if (notification.replyOf) {
+        const user = await User.findById(notification.user);
+        user.notifications.pull(notification._id);
+        user.save();
+      } else {
+        const user = await User.findById(notification.user);
+        user.notifications.pull(notification._id);
+        user.save();
+      }
+
       await notification.remove();
     }
   } catch (err) {
