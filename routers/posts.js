@@ -294,7 +294,7 @@ router.delete("/:id/reactions", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(post.user + "notification", oldNotification);
+    global.io.sockets.emit(post.user + "notification", "change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {

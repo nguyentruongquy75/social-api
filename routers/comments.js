@@ -177,7 +177,7 @@ router.delete("/", async (req, res) => {
       await oldNotification.save();
     }
     // socket
-    global.io.sockets.emit(post.user + "notification", oldNotification);
+    global.io.sockets.emit(post.user + "notification", "change");
 
     res.status(200).json(deletedComment);
 
@@ -370,7 +370,7 @@ router.delete("/:commentId/reactions", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(comment.user + "notification", oldNotification);
+    global.io.sockets.emit(comment.user + "notification", "change");
 
     res.status(200).json(deleteReaction);
   } catch (error) {
@@ -563,7 +563,7 @@ router.delete("/:commentId/reply", async (req, res) => {
     }
 
     // socket
-    global.io.sockets.emit(comment.user + "notification", oldNotification);
+    global.io.sockets.emit(comment.user + "notification", "change");
 
     res.status(200).json(deletedComment);
   } catch (error) {
