@@ -110,13 +110,15 @@ router.delete("/", async (req, res) => {
       // socket
       global.io.sockets.emit(friend._id + "notification", "Change");
 
-      global.io.emit(userId + "newsfeed", "change");
+      global.io.emit(friend._id + "newsfeed", "change");
     });
 
     await user.save();
 
     // socket
     global.io.sockets.emit(user._id + "notification", "Change");
+
+    global.io.emit(user._id + "newsfeed", "change");
 
     // remove image from firebase
     deletePost.image.forEach((image) => {
