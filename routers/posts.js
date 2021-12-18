@@ -53,6 +53,9 @@ router.post("/", upload.array("image", 12), async (req, res) => {
       const friend = await User.findById(userId);
       friend.newsfeed.push(newPost._id);
       friend.save();
+
+      // socket
+      global.io.emit(userId + "newsfeed", "change");
     });
 
     await user.save();
@@ -106,12 +109,21 @@ router.delete("/", async (req, res) => {
       friend.save();
       // socket
       global.io.sockets.emit(friend._id + "notification", "Change");
+
+      global.io.emit(userId + "newsfeed", "change");
     });
 
     await user.save();
 
     // socket
     global.io.sockets.emit(user._id + "notification", "Change");
+
+    // remove image from firebase
+    deletePost.image.forEach((image) => {
+      firebase.deleteFile(
+        image.slice(image.lastIndexOf("/") + 1, image.indexOf("?"))
+      );
+    });
 
     res.status(200).json(deletePost);
   } catch (error) {

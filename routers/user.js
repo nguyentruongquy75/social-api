@@ -9,10 +9,6 @@ const router = express.Router();
 const upload = require("../multer");
 
 const firebase = require("../firebase");
-// test
-router.post("/upload", upload.single("file"), async (req, res) => {
-  firebase.deleteFile("1639104910429event1.png");
-});
 
 // get user by name
 router.get("/", async (req, res) => {
@@ -141,7 +137,7 @@ router.post("/:id/invite", async function (req, res) {
     user.friendInvitations.push(savedInvitation._id);
 
     // socket
-    global.io.sockets.emit(userId + "invitation", savedInvitation);
+    global.io.sockets.emit(userId + "invitation", "change");
 
     await user.save();
     res.status(200).json(invitation);
@@ -177,6 +173,7 @@ router.patch("/:id/invite", async function (req, res) {
     receiver.save();
 
     updateInvitation.remove();
+
     res.status(200).json("Success");
   } catch (err) {
     res.status(400).json(err);
@@ -197,7 +194,7 @@ router.delete("/:id/invite", async function (req, res) {
     receiver.save();
 
     // socket
-    global.io.sockets.emit(receiver._id + "invitation", savedInvitation);
+    global.io.sockets.emit(receiver._id + "invitation", "change");
 
     res.status(200).json("Success");
   } catch (err) {

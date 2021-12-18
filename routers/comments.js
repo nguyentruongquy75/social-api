@@ -502,6 +502,8 @@ router.post("/:commentId/reply", async (req, res) => {
     // socket
     global.io.emit(commentId + "commentreply", "change");
 
+    global.io.emit(comment.post + "postcomment", "change");
+
     await savedReplyComment.populate("user");
     res.status(200).json(savedReplyComment);
   } catch (error) {
@@ -583,6 +585,8 @@ router.delete("/:commentId/reply", async (req, res) => {
     global.io.sockets.emit(comment.user + "notification", "change");
 
     global.io.emit(commentId + "commentreply", "change");
+
+    global.io.emit(comment.post + "postcomment", "change");
 
     res.status(200).json(deletedComment);
   } catch (error) {
