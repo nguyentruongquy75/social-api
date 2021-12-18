@@ -200,7 +200,12 @@ router.get("/:commentId/reactions", async (req, res) => {
   const commentId = req.params.commentId;
 
   try {
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId).populate({
+      path: "reactions",
+      populate: {
+        path: "user",
+      },
+    });
     res.status(200).json(comment.reactions);
   } catch (error) {
     res.status(400).json(error);
