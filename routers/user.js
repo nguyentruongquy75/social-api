@@ -297,4 +297,22 @@ router.get("/:id/posts", async (req, res) => {
   }
 });
 
+// ================== Chat room =====================
+
+router.get("/:id/chatrooms", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).populate({
+      path: "chats",
+      populate: {
+        path: "participants lastMessage",
+      },
+    });
+
+    res.status(200).json(user.chats);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 module.exports = router;

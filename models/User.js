@@ -82,6 +82,12 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  chats: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ChatRoom",
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {

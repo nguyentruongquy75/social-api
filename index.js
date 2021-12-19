@@ -9,6 +9,7 @@ const authRoute = require("./routers/auth");
 const userRoute = require("./routers/user");
 const postRoute = require("./routers/posts");
 const commentRoute = require("./routers/comments");
+const chatRoute = require("./routers/chat");
 const db = mongoose.connection;
 
 // socketio
@@ -40,6 +41,7 @@ app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/posts", postRoute);
 app.use("/comments", commentRoute);
+app.use("/chat", chatRoute);
 app.use("/uploads", express.static("uploads"));
 
 module.exports = app;
