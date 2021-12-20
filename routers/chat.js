@@ -46,6 +46,7 @@ router.post("/:id/messages", async (req, res) => {
       chatRoom: chatRoomId,
     });
     await message.save();
+
     const chatRoom = await ChatRoom.findById(chatRoomId);
 
     chatRoom.messages.push(message._id);
@@ -85,6 +86,30 @@ router.post("/", async (req, res) => {
     });
 
     res.status(200).json(newChatRoom);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+// search
+router.get("/", async (req, res) => {
+  const searchValue = req.query.q;
+  const userId = req.query.userId;
+  const regex = new RegExp(searchValue, "i");
+  try {
+    const resultOfFriend = await User.find({
+      fullName: { $regex: regex },
+      friends: {
+        $elemMatch: { $eq: userId },
+      },
+    }).limit(10);
+
+    const resultSuggest = await User.find({
+      fullName: { $regex: regex },
+      friends: { $ne: userId },
+    }).limit(10);
+
+    res.status(200).json(resultOfFriend.concat(resultSuggest));
   } catch (err) {
     res.status(400).json(err);
   }
