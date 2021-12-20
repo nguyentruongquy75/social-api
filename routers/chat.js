@@ -54,7 +54,7 @@ router.post("/:id/messages", async (req, res) => {
     chatRoom.save();
 
     // socket
-    global.io.emit(chatRoomId + "chat", "change");
+    global.io.emit(chatRoomId + "chat", message);
 
     chatRoom.participants.forEach(async (user) => {
       // socket
