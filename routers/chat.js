@@ -20,14 +20,18 @@ router.get("/:id", async (req, res) => {
 // get all messages of chat room
 router.get("/:id/messages", async (req, res) => {
   const chatRoomId = req.params.id;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 20;
   try {
-    const chatRoom = await ChatRoom.findById(chatRoomId).populate({
+    const chatRoom = await ChatRoom.findById(chatRoomId, "messages").populate({
       path: "messages",
+      options: { sort: { createAt: -1 }, skip: (page - 1) * limit, limit },
       populate: {
         path: "reaction user",
       },
     });
-    res.status(200).json(chatRoom.messages);
+
+    res.status(200).json(chatRoom.messages.reverse());
   } catch (err) {
     res.status(400).json(err);
   }
