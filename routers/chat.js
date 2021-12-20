@@ -46,7 +46,7 @@ router.post("/:id/messages", async (req, res) => {
 
     chatRoom.messages.push(message._id);
     chatRoom.lastMessage = message._id;
-    await chatRoom.save();
+    chatRoom.save();
 
     // socket
     global.io.emit(chatRoomId + "chat", "change");
@@ -71,7 +71,6 @@ router.post("/", async (req, res) => {
   try {
     const newChatRoom = new ChatRoom(req.body);
     await newChatRoom.save();
-
     newChatRoom.participants.forEach(async (user) => {
       const participant = await User.findById(user);
       participant.chats.push(newChatRoom._id);

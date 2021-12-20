@@ -309,7 +309,7 @@ router.get("/:id/chatrooms", async (req, res) => {
       },
     });
 
-    res.status(200).json(user.chats);
+    res.status(200).json(user.chats.reverse());
   } catch (error) {
     res.status(400).json(error);
   }
