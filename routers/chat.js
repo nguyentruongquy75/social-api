@@ -81,18 +81,21 @@ router.post("/", async (req, res) => {
       },
     }).populate("participants");
     if (!oldChatRoom) {
-      const newChatRoom = new ChatRoom(req.body).populate("participants");
+      const newChatRoom = new ChatRoom(req.body);
       await newChatRoom.save();
-      newChatRoom.participants.forEach(async (user) => {
-        const participant = await User.findById(user);
-        participant.chats.push(newChatRoom._id);
-        participant.save();
+      await newChatRoom.populate("participants");
+      if (newChatRoom.lastMessage) {
+        newChatRoom.participants.forEach(async (user) => {
+          const participant = await User.findById(user);
+          participant.chats.push(newChatRoom._id);
+          participant.save();
 
-        // socket
-        global.io.emit(user + "chatrooms", "change");
-      });
+          // socket
+          global.io.emit(user + "chatrooms", "change");
+        });
+      }
 
-      res.status(200).json(newChatRoom);
+      return res.status(200).json(newChatRoom);
     }
     res.status(200).json(oldChatRoom);
   } catch (err) {
