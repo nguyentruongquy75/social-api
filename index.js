@@ -28,6 +28,16 @@ global.io = io;
 dotenv.config();
 app.use(bodyParser.json());
 
+io.on("connection", (socket) => {
+  socket.on("callvoicejoin", (data) => {
+    io.emit(data.chatRoom._id + "callvoicejoin", data.user);
+  });
+
+  socket.on("callvoicedisconnect", (data) => {
+    io.emit(data.chatRoom._id + "callvoicedisconnect", data.user);
+  });
+});
+
 //connect db
 mongoose
   .connect(process.env.MONGO, { useNewUrlParser: true })
