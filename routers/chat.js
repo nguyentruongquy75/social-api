@@ -127,7 +127,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-//call
+//call voice
 router.post("/:id/voice", async (req, res) => {
   const chatRoomId = req.params.id;
   const userId = req.body.user;
@@ -142,6 +142,32 @@ router.post("/:id/voice", async (req, res) => {
     participants.forEach((participant) => {
       // socket
       global.io.emit(participant + "callvoiceinvitation", {
+        chatRoom,
+        user,
+      });
+    });
+
+    res.status(200).json("success");
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+//call voice
+router.post("/:id/video", async (req, res) => {
+  const chatRoomId = req.params.id;
+  const userId = req.body.user;
+  try {
+    const chatRoom = await ChatRoom.findById(chatRoomId);
+    const user = await User.findById(userId);
+
+    const participants = chatRoom.participants.filter(
+      (user) => user + "" !== userId + ""
+    );
+
+    participants.forEach((participant) => {
+      // socket
+      global.io.emit(participant + "callvideoinvitation", {
         chatRoom,
         user,
       });

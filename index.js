@@ -29,12 +29,22 @@ dotenv.config();
 app.use(bodyParser.json());
 
 io.on("connection", (socket) => {
+  // call voice
   socket.on("callvoicejoin", (data) => {
     io.emit(data.chatRoom._id + "callvoicejoin", data.user);
   });
 
   socket.on("callvoicedisconnect", (data) => {
     io.emit(data.chatRoom._id + "callvoicedisconnect", data.user);
+  });
+
+  // call video
+  socket.on("callvideojoin", (data) => {
+    io.emit(data.chatRoom._id + "callvideojoin", data.user);
+  });
+
+  socket.on("callvideodisconnect", (data) => {
+    io.emit(data.chatRoom._id + "callvideodisconnect", data.user);
   });
 });
 
