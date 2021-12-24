@@ -321,7 +321,7 @@ router.get("/:id/contacts", async (req, res) => {
   try {
     const user = await User.findById(userId).populate("friends");
 
-    const sortedContact = user.friends.sort((a, b) => b.isOnline - a.isOnline);
+    const sortedContact = user.friends.filter((friend) => friend.isOnline);
 
     res.status(200).json(sortedContact.slice(0, 20));
   } catch (error) {
