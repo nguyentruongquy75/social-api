@@ -60,20 +60,24 @@ io.on("connection", (socket) => {
   socket.on("online", async (userId) => {
     storedUser = userId;
     const user = await User.findById(userId);
-    user.isOnline = true;
-    user.save();
-    user.friends.forEach((friend) => {
-      socket.emit(friend + "contacts", "change");
-    });
+    if (user) {
+      user.isOnline = true;
+      user.save();
+      user.friends.forEach((friend) => {
+        io.emit(friend + "contacts", "change");
+      });
+    }
   });
 
   socket.conn.on("close", async () => {
     const user = await User.findById(storedUser);
-    user.isOnline = false;
-    user.save();
-    user.friends.forEach((friend) => {
-      socket.emit(friend + "contacts", "change");
-    });
+    if (user) {
+      user.isOnline = false;
+      user.save();
+      user.friends.forEach((friend) => {
+        io.emit(friend + "contacts", "change");
+      });
+    }
   });
 });
 
