@@ -88,6 +88,10 @@ const userSchema = new mongoose.Schema({
       ref: "ChatRoom",
     },
   ],
+  isOnline: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.pre("save", async function (next) {

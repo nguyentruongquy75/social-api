@@ -12,6 +12,8 @@ const commentRoute = require("./routers/comments");
 const chatRoute = require("./routers/chat");
 const db = mongoose.connection;
 
+const User = require("./models/User");
+
 // socketio
 
 const { Server } = require("socket.io");
@@ -27,8 +29,16 @@ global.io = io;
 
 dotenv.config();
 app.use(bodyParser.json());
+//connect db
+mongoose
+  .connect(process.env.MONGO, { useNewUrlParser: true })
+  .then(() => console.log("DB Connected!"));
+db.on("error", (err) => {
+  console.log("DB connection error:", err.message);
+});
 
 io.on("connection", (socket) => {
+  let storedUser = null;
   // call voice
   socket.on("callvoicejoin", (data) => {
     io.emit(data.chatRoom._id + "callvoicejoin", data.user);
@@ -46,14 +56,25 @@ io.on("connection", (socket) => {
   socket.on("callvideodisconnect", (data) => {
     io.emit(data.chatRoom._id + "callvideodisconnect", data.user);
   });
-});
 
-//connect db
-mongoose
-  .connect(process.env.MONGO, { useNewUrlParser: true })
-  .then(() => console.log("DB Connected!"));
-db.on("error", (err) => {
-  console.log("DB connection error:", err.message);
+  socket.on("online", async (userId) => {
+    storedUser = userId;
+    const user = await User.findById(userId);
+    user.isOnline = true;
+    user.save();
+    user.friends.forEach((friend) => {
+      socket.emit(friend + "contacts", "change");
+    });
+  });
+
+  socket.conn.on("close", async () => {
+    const user = await User.findById(storedUser);
+    user.isOnline = false;
+    user.save();
+    user.friends.forEach((friend) => {
+      socket.emit(friend + "contacts", "change");
+    });
+  });
 });
 
 app.use(cors());

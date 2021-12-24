@@ -315,4 +315,17 @@ router.get("/:id/chatrooms", async (req, res) => {
   }
 });
 
+// ================= contact =======================
+router.get("/:id/contacts", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).populate("friends");
+
+    const sortedContact = user.friends.sort((a, b) => b.isOnline - a.isOnline);
+
+    res.status(200).json(sortedContact.slice(0, 20));
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
 module.exports = router;
