@@ -63,23 +63,52 @@ router.post("/", upload.single("avatar"), async (req, res) => {
 });
 
 // update user
-router.patch("/", upload.single("avatar"), async (req, res) => {
-  let data = req.body;
-  if (req.file) {
-    const avatar = await firebase.uploadFile(req.file);
-    Object.assign(data, {
-      avatar,
-    });
+router.patch(
+  "/",
+  upload.fields([{ name: "avatar" }, { name: "cover" }]),
+  async (req, res) => {
+    let data = req.body;
+    if (req.files) {
+      if (req.files.avatar && req.files.avatar.length > 0) {
+        const avatar = await firebase.uploadFile(req.files.avatar[0]);
+        Object.assign(data, {
+          avatar,
+        });
+      }
+
+      if (req.files.cover && req.files.cover.length > 0) {
+        const cover = await firebase.uploadFile(req.files.cover[0]);
+        Object.assign(data, {
+          cover,
+        });
+      }
+    }
+
+    try {
+      const user = await User.findByIdAndUpdate(req.body._id, data);
+      if (data.avatar) {
+        const avatarFileName = user.avatar.slice(
+          user.avatar.lastIndexOf("/") + 1,
+          user.avatar.indexOf("?")
+        );
+        avatarFileName !== "defaultAvatar.png" &&
+          firebase.deleteFile(avatarFileName);
+      }
+      if (data.cover) {
+        firebase.deleteFile(
+          user.cover.slice(
+            user.cover.lastIndexOf("/") + 1,
+            user.cover.indexOf("?")
+          )
+        );
+      }
+      const updateUser = await User.findById(req.body._id);
+      res.status(200).json(updateUser);
+    } catch (error) {
+      res.status(400).json(error);
+    }
   }
-  try {
-    const updateUser = await User.findByIdAndUpdate(req.body._id, data, {
-      new: true,
-    });
-    res.status(200).json(updateUser);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-});
+);
 
 // delete
 router.delete("/", async (req, res) => {
