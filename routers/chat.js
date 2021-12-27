@@ -46,7 +46,7 @@ router.patch("/:id/messages", async (req, res) => {
       path: "messages",
       match: {
         seen: {
-          $exists: false,
+          $exists: true,
         },
         user: {
           $ne: userId,
