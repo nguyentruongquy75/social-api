@@ -37,6 +37,44 @@ router.get("/:id/messages", async (req, res) => {
   }
 });
 
+// read messages of chat room
+router.patch("/:id/messages", async (req, res) => {
+  const chatRoomId = req.params.id;
+  const userId = req.body.userId;
+  try {
+    const chatRoom = await ChatRoom.findById(chatRoomId).populate({
+      path: "messages",
+      match: {
+        seen: {
+          $exists: false,
+        },
+        user: {
+          $ne: userId,
+        },
+      },
+    });
+
+    if (chatRoom.messages.length > 0) {
+      chatRoom.messages.forEach((message) => {
+        message.seen.push(userId);
+      });
+
+      chatRoom.participants.forEach(async (user) => {
+        // socket
+        global.io.emit(user + "chatrooms", "change");
+      });
+
+      chatRoom.save();
+
+      // socket
+      global.io.emit(chatRoomId + "chat", "change");
+    }
+    res.status(200).json(chatRoom.messages);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 // add messages
 router.post("/:id/messages", async (req, res) => {
   const chatRoomId = req.params.id;
