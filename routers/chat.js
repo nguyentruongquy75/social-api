@@ -87,6 +87,7 @@ router.post("/:id/messages", async (req, res) => {
 
     chatRoom.messages.push(message._id);
     chatRoom.lastMessage = message._id;
+    chatRoom.isRead = false;
     chatRoom.save();
 
     // socket
