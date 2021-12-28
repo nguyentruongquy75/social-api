@@ -42,29 +42,27 @@ router.patch("/:id/messages", async (req, res) => {
   const chatRoomId = req.params.id;
   const userId = req.body.userId;
   try {
-    const chatRoom = await ChatRoom.findById(chatRoomId).populate({
-      path: "messages",
-      match: {
-        seen: {
-          $exists: true,
-        },
+    const chatRoom = await ChatRoom.findById(chatRoomId).populate(
+      "messages",
+      null,
+      {
         user: {
           $ne: userId,
         },
-      },
-    });
+        seen: [],
+      }
+    );
 
     if (chatRoom.messages.length > 0) {
       chatRoom.messages.forEach((message) => {
         message.seen.push(userId);
+        message.save();
       });
 
       chatRoom.participants.forEach(async (user) => {
         // socket
         global.io.emit(user + "chatrooms", "change");
       });
-
-      chatRoom.save();
 
       // socket
       global.io.emit(chatRoomId + "chat", "change");

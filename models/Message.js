@@ -24,12 +24,15 @@ const messageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  seen: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  seen: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("Message", messageSchema);
