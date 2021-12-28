@@ -344,6 +344,28 @@ router.get("/:id/chatrooms", async (req, res) => {
   }
 });
 
+// read chat room
+router.patch("/:id/chatrooms", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).populate({
+      path: "chats",
+      match: {
+        isRead: false,
+      },
+    });
+
+    user.chats.forEach((chat) => {
+      chat.isRead = true;
+      chat.save();
+    });
+
+    res.status(200).json(user.chats);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 // ================= contact =======================
 router.get("/:id/contacts", async (req, res) => {
   const userId = req.params.id;
